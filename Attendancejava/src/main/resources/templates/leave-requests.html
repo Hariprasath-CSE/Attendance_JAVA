@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Requests - Attendance Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,170.7C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover, cover;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.9);
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.25);
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .main-content {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .badge {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar">
+                <h3 class="text-center mb-4"><i class="bi bi-calendar-check"></i> Attendance Portal</h3>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/"><i class="bi bi-house-door"></i> Dashboard</a>
+                    <a class="nav-link" href="/students"><i class="bi bi-people"></i> Students</a>
+                    <a class="nav-link" href="/attendance"><i class="bi bi-clipboard-check"></i> Attendance</a>
+                    <a class="nav-link active" href="/leave-requests"><i class="bi bi-file-earmark-text"></i> Leave Requests</a>
+                </nav>
+            </div>
+            <div class="col-md-10 main-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Leave Requests</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLeaveModal">
+                        <i class="bi bi-plus-circle"></i> New Leave Request
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-hover" id="leaveTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Leave Request Modal -->
+    <div class="modal fade" id="addLeaveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Leave Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addLeaveForm">
+                        <div class="mb-3">
+                            <label class="form-label">Student</label>
+                            <select class="form-select" name="studentId" id="leaveStudentSelect" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" class="form-control" name="leaveStartDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" name="leaveEndDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reason</label>
+                            <textarea class="form-control" name="reason" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitLeaveRequest()">Submit Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        loadStudents();
+        loadLeaveRequests();
+
+        function loadStudents() {
+            fetch('/api/students')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('leaveStudentSelect');
+                    select.innerHTML = '<option value="">Select a student</option>';
+                    data.forEach(student => {
+                        select.innerHTML += `<option value="${student.studentId}">${student.name}</option>`;
+                    });
+                });
+        }
+
+        function loadLeaveRequests() {
+            fetch('/api/leave-requests')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#leaveTable tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(leave => {
+                        const statusClass = leave.status === 'APPROVED' ? 'success' : 
+                                          leave.status === 'REJECTED' ? 'danger' : 'warning';
+                        const row = `
+                            <tr>
+                                <td>${leave.leaveId}</td>
+                                <td>${leave.student?.name || '-'}</td>
+                                <td>${leave.leaveStartDate}</td>
+                                <td>${leave.leaveEndDate}</td>
+                                <td>${leave.reason}</td>
+                                <td><span class="badge bg-${statusClass}">${leave.status}</span></td>
+                                <td>
+                                    ${leave.status === 'PENDING' ? `
+                                    <button class="btn btn-sm btn-success" onclick="approveLeave(${leave.leaveId})">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="rejectLeave(${leave.leaveId})">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                });
+        }
+
+        function submitLeaveRequest() {
+            const form = document.getElementById('addLeaveForm');
+            const formData = new FormData(form);
+            
+            const leaveRequest = {
+                studentId: formData.get('studentId'),
+                leaveStartDate: formData.get('leaveStartDate'),
+                leaveEndDate: formData.get('leaveEndDate'),
+                reason: formData.get('reason'),
+                status: 'PENDING'
+            };
+
+            fetch('/api/leave-requests', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(leaveRequest)
+            })
+            .then(response => {
+                if (response.ok) {
+                    loadLeaveRequests();
+                    bootstrap.Modal.getInstance(document.getElementById('addLeaveModal')).hide();
+                    form.reset();
+                    alert('Leave request submitted successfully!');
+                } else {
+                    alert('Error submitting leave request.');
+                }
+            });
+        }
+
+        function approveLeave(id) {
+            fetch(`/api/leave-requests/${id}/approve`, {
+                method: 'PUT'
+            })
+            .then(response => {
+                if (response.ok) {
+                    loadLeaveRequests();
+                    alert('Leave request approved!');
+                }
+            });
+        }
+
+        function rejectLeave(id) {
+            fetch(`/api/leave-requests/${id}/reject`, {
+                method: 'PUT'
+            })
+            .then(response => {
+                if (response.ok) {
+                    loadLeaveRequests();
+                    alert('Leave request rejected!');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

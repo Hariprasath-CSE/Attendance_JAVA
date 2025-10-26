@@ -24,4 +24,8 @@ public class LeaveRequestService {
     public Optional<LeaveRequest> getLeaveRequestById(Long id) {
         return leaveRequestRepository.findById(id);
     }
+
+    public List<LeaveRequest> getAllLeaveRequests() {
+        return leaveRequestRepository.findAll();
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.Attendancejava.service.impl;
 
 import com.example.Attendancejava.entity.LeaveRequest;
+import com.example.Attendancejava.entity.LeaveStatus;
 import com.example.Attendancejava.repository.LeaveRequestRepository;
 import com.example.Attendancejava.service.LeaveRequestService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     @Override
     public LeaveRequest submitLeaveRequest(LeaveRequest leaveRequest) {
-        leaveRequest.setStatus(LeaveRequest.LeaveStatus.PENDING);
+        leaveRequest.setStatus(LeaveStatus.PENDING);
         leaveRequest.setRequestedOn(LocalDateTime.now());
         return leaveRequestRepository.save(leaveRequest);
     }
@@ -27,7 +28,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     public LeaveRequest approveLeaveRequest(Long leaveId, String approvedBy) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveId)
             .orElseThrow(() -> new RuntimeException("Leave request not found with id: " + leaveId));
-        leaveRequest.setStatus(LeaveRequest.LeaveStatus.APPROVED);
+        leaveRequest.setStatus(LeaveStatus.APPROVED);
         leaveRequest.setApprovedBy(approvedBy);
         return leaveRequestRepository.save(leaveRequest);
     }
@@ -36,7 +37,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     public LeaveRequest rejectLeaveRequest(Long leaveId, String rejectedBy) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveId)
             .orElseThrow(() -> new RuntimeException("Leave request not found with id: " + leaveId));
-        leaveRequest.setStatus(LeaveRequest.LeaveStatus.REJECTED);
+        leaveRequest.setStatus(LeaveStatus.REJECTED);
         leaveRequest.setApprovedBy(rejectedBy);
         return leaveRequestRepository.save(leaveRequest);
     }
@@ -48,7 +49,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     @Override
     public List<LeaveRequest> getPendingLeaveRequests() {
-        return leaveRequestRepository.findByStatus(LeaveRequest.LeaveStatus.PENDING);
+        return leaveRequestRepository.findByStatus(LeaveStatus.PENDING);
     }
 
     @Override

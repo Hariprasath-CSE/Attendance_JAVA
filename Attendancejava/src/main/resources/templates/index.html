@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Attendance Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,170.7C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover, cover;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.9);
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.25);
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .main-content {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            min-height: 100vh;
+            border-radius: 0;
+        }
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .stat-card i {
+            font-size: 3rem;
+            opacity: 0.8;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar">
+                <h3 class="text-center mb-4"><i class="bi bi-calendar-check"></i> Attendance Portal</h3>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="/"><i class="bi bi-house-door"></i> Dashboard</a>
+                    <a class="nav-link" href="/students"><i class="bi bi-people"></i> Students</a>
+                    <a class="nav-link" href="/attendance"><i class="bi bi-clipboard-check"></i> Attendance</a>
+                    <a class="nav-link" href="/leave-requests"><i class="bi bi-file-earmark-text"></i> Leave Requests</a>
+                </nav>
+            </div>
+            <div class="col-md-10 main-content">
+                <h2 class="mb-4">Dashboard</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <i class="bi bi-people"></i>
+                            <div class="stat-number" id="totalStudents">0</div>
+                            <div>Total Students</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                            <i class="bi bi-calendar-check"></i>
+                            <div class="stat-number" id="todayAttendance">0</div>
+                            <div>Today's Attendance</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                            <i class="bi bi-file-text"></i>
+                            <div class="stat-number" id="pendingLeaves">0</div>
+                            <div>Pending Leaves</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                            <i class="bi bi-graph-up"></i>
+                            <div class="stat-number" id="attendanceRate">0%</div>
+                            <div>Attendance Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Activity</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Recent attendance and leave requests will appear here.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-calendar-month"></i> Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a href="/students" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Student</a>
+                                    <a href="/attendance" class="btn btn-success"><i class="bi bi-check-square"></i> Mark Attendance</a>
+                                    <a href="/leave-requests" class="btn btn-info"><i class="bi bi-file-text"></i> View Leave Requests</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fetch dashboard statistics
+        fetch('/api/students')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('totalStudents').textContent = data.length;
+            });
+        
+        fetch('/api/leave-requests')
+            .then(response => response.json())
+            .then(data => {
+                const pending = data.filter(l => l.status === 'PENDING').length;
+                document.getElementById('pendingLeaves').textContent = pending;
+            });
+    </script>
+</body>
+</html>
+
